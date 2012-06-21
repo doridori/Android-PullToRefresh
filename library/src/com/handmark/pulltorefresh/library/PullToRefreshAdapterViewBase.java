@@ -17,10 +17,13 @@ package com.handmark.pulltorefresh.library;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -33,7 +36,7 @@ import com.handmark.pulltorefresh.library.internal.EmptyViewMethodAccessor;
 import com.handmark.pulltorefresh.library.internal.IndicatorLayout;
 
 public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extends PullToRefreshBase<T> implements
-		OnScrollListener {
+		OnScrollListener, View.OnTouchListener {
 
 	static final boolean DEFAULT_SHOW_INDICATOR = true;
 
@@ -43,7 +46,14 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 	private View mEmptyView;
 	private FrameLayout mRefreshableViewHolder;
 
-	private IndicatorLayout mIndicatorIvTop;
+    private int mCurrentScrollState;
+    private boolean mFingerUp = true;
+    private final Handler mFlingHandler = new FlingHandler();
+    private static final int MESSAGE_FLING_DONE = 1;
+    private static final int DELAY_FLING_DONE = 500;
+    private OnFlingListener mOnFlingListener;
+
+    private IndicatorLayout mIndicatorIvTop;
 	private IndicatorLayout mIndicatorIvBottom;
 
 	private boolean mShowIndicator;
@@ -71,7 +81,7 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 	 * when the Adapter View is scrolled to the top and the mode is set to
 	 * {@link Mode#PULL_DOWN_TO_REFRESH}. The default value is
 	 * {@value #DEFAULT_SHOW_INDICATOR}.
-	 * 
+	 *
 	 * @return true if the indicators will be shown
 	 */
 	public boolean getShowIndicator() {
@@ -116,23 +126,45 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 		}
 	}
 
-	public final void onScrollStateChanged(final AbsListView view, final int scrollState) {
-		if (null != mOnScrollListener) {
-			mOnScrollListener.onScrollStateChanged(view, scrollState);
-		}
-	}
+    public void onScrollStateChanged(final AbsListView view, final int scrollState) {
+            if (null != mOnScrollListener) {
+                mOnScrollListener.onScrollStateChanged(view, scrollState);
+            }
+            /*
+            switch (scrollState){
+                case 1:
+                    Debug.startMethodTracing("scroll");
+                    break;
+                case 0:
+                    Debug.stopMethodTracing();
+                    break;
+            }*/
+
+            if (mCurrentScrollState == SCROLL_STATE_FLING && scrollState != SCROLL_STATE_FLING) {
+                final Message message = mFlingHandler.obtainMessage(MESSAGE_FLING_DONE, getContext());
+                mFlingHandler.removeMessages(MESSAGE_FLING_DONE);
+                mFlingHandler.sendMessageDelayed(message, mFingerUp ? 0 : DELAY_FLING_DONE);
+
+            } else if (scrollState == SCROLL_STATE_FLING) {
+                mFlingHandler.removeMessages(MESSAGE_FLING_DONE);
+                if (mOnFlingListener != null) mOnFlingListener.onFling();
+            }
+            mCurrentScrollState = scrollState;
+        }
+
+
 
 	/**
 	 * Sets the Empty View to be used by the Adapter View.
-	 * 
+	 *
 	 * We need it handle it ourselves so that we can Pull-to-Refresh when the
 	 * Empty View is shown.
-	 * 
+	 *
 	 * Please note, you do <strong>not</strong> usually need to call this method
 	 * yourself. Calling setEmptyView on the AdapterView will automatically call
 	 * this method and set everything up. This includes when the Android
 	 * Framework automatically sets the Empty View based on it's ID.
-	 * 
+	 *
 	 * @param newEmptyView
 	 *            - Empty View to be used
 	 */
@@ -163,20 +195,24 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 		}
 	}
 
-	public final void setOnLastItemVisibleListener(OnLastItemVisibleListener listener) {
-		mOnLastItemVisibleListener = listener;
-	}
+    public final void setOnLastItemVisibleListener(OnLastItemVisibleListener listener) {
+        mOnLastItemVisibleListener = listener;
+    }
 
-	public final void setOnScrollListener(OnScrollListener listener) {
-		mOnScrollListener = listener;
-	};
+    public final void setOnScrollListener(OnScrollListener listener) {
+        mOnScrollListener = listener;
+    }
+
+    public final void setOnFlingListener(OnFlingListener listener) {
+        mOnFlingListener = listener;
+    }
 
 	/**
 	 * Sets whether an indicator graphic should be displayed when the View is in
 	 * a state where a Pull-to-Refresh can happen. An example of this state is
 	 * when the Adapter View is scrolled to the top and the mode is set to
 	 * {@link Mode#PULL_DOWN_TO_REFRESH}
-	 * 
+	 *
 	 * @param showIndicator
 	 *            - true if the indicators should be shown.
 	 */
@@ -202,7 +238,7 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 	/**
 	 * Returns the number of Adapter View Footer Views. This will always return
 	 * 0 for non-ListView views.
-	 * 
+	 *
 	 * @return 0 for non-ListView views, possibly 1 for ListView
 	 */
 	protected int getNumberInternalFooterViews() {
@@ -212,7 +248,7 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 	/**
 	 * Returns the number of Adapter View Header Views. This will always return
 	 * 0 for non-ListView views.
-	 * 
+	 *
 	 * @return 0 for non-ListView views, possibly 1 for ListView
 	 */
 	protected int getNumberInternalHeaderViews() {
@@ -409,4 +445,22 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 			}
 		}
 	}
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        final int action = event.getAction();
+        mFingerUp = action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL;
+        return false;
+    }
+
+    private class FlingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MESSAGE_FLING_DONE:
+                    if (mOnFlingListener != null) mOnFlingListener.onFlingDone();
+                    break;
+            }
+        }
+    }
 }

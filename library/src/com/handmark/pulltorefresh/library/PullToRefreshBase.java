@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.handmark.pulltorefresh.library;
 
+import com.handmark.pulltorefresh.library.internal.LoadingLayout;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
@@ -30,8 +32,6 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.LinearLayout;
-
-import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 
 public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
@@ -85,6 +85,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 	private int mHeaderHeight;
 	private final Handler mHandler = new Handler();
 
+    private OnConfigureHeaderListener mOnConfigureHeaderListener;
 	private OnRefreshListener mOnRefreshListener;
 	private OnRefreshListener2 mOnRefreshListener2;
 
@@ -219,6 +220,8 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 		}
 
 		if (action != MotionEvent.ACTION_DOWN && mIsBeingDragged) {
+
+
 			return true;
 		}
 
@@ -254,6 +257,9 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 					mLastMotionY = mInitialMotionY = event.getY();
 					mLastMotionX = event.getX();
 					mIsBeingDragged = false;
+                    if (null != mOnConfigureHeaderListener) {
+                        mOnConfigureHeaderListener.onConfigureHeader();
+                    }
 				}
 				break;
 			}
@@ -261,6 +267,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
 		return mIsBeingDragged;
 	}
+
 
 	/**
 	 * Mark the current Refresh as complete. Will Reset the UI and hide the
@@ -300,6 +307,9 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 			case MotionEvent.ACTION_DOWN: {
 				if (isReadyForPull()) {
 					mLastMotionY = mInitialMotionY = event.getY();
+                    if (null != mOnConfigureHeaderListener) {
+                        mOnConfigureHeaderListener.onConfigureHeader();
+                    }
 					return true;
 				}
 				break;
@@ -459,11 +469,20 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 		mOnRefreshListener2 = listener;
 	}
 
-	/**
+    /**
+     * Set OnConfigureHeaderListener for the Widget
+     *
+     * @param listener - Listener to be used when the Widget header needs configuration
+     */
+    public final void setmOnConfigureHeaderListener(OnConfigureHeaderListener listener) {
+        mOnConfigureHeaderListener = listener;
+    }
+
+    /**
 	 * Set Text to show when the Widget is being Pulled
 	 * <code>setPullLabel(releaseLabel, Mode.BOTH)</code>
 	 * 
-	 * @param releaseLabel
+	 * @param pullLabel
 	 *            - String to display
 	 */
 	public void setPullLabel(String pullLabel) {
@@ -521,7 +540,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 	 * Set Text to show when the Widget is refreshing
 	 * <code>setRefreshingLabel(releaseLabel, Mode.BOTH)</code>
 	 * 
-	 * @param releaseLabel
+	 * @param refreshingLabel
 	 *            - String to display
 	 */
 	public void setRefreshingLabel(String refreshingLabel) {
@@ -1056,6 +1075,24 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 		public void onRefresh();
 
 	}
+
+    public static interface OnConfigureHeaderListener {
+
+        /**
+         * onConfigureHeader will be called when the user touches a list and the list is ready to be pulled
+         * so that the header appearance can be configured (primarily for change last updated label)
+         */
+        public void onConfigureHeader();
+
+    }
+
+    public static interface OnFlingListener {
+
+        public void onFling();
+
+        public void onFlingDone();
+
+    }
 
 	/**
 	 * An advanced version of the Listener to listen for callbacks to Refresh.
