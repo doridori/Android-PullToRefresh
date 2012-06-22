@@ -474,7 +474,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
      *
      * @param listener - Listener to be used when the Widget header needs configuration
      */
-    public final void setmOnConfigureHeaderListener(OnConfigureHeaderListener listener) {
+    public final void setOnConfigureHeaderListener(OnConfigureHeaderListener listener) {
         mOnConfigureHeaderListener = listener;
     }
 

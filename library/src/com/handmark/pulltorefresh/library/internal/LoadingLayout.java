@@ -22,6 +22,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
@@ -40,7 +42,9 @@ import com.handmark.pulltorefresh.library.R;
 
 public class LoadingLayout extends FrameLayout {
 
-	static final int DEFAULT_ROTATION_ANIMATION_DURATION = 600;
+    static final int DEFAULT_ROTATION_ANIMATION_DURATION = 150;
+
+    private final ProgressBar mHeaderProgress;
 
 	private final ImageView mHeaderImage;
 	private final Matrix mHeaderImageMatrix;
@@ -55,9 +59,11 @@ public class LoadingLayout extends FrameLayout {
 	private float mRotationPivotX, mRotationPivotY;
 
 	private final Animation mRotateAnimation;
+    private boolean mLoadingImageShouldRotate;
 
 	public LoadingLayout(Context context, final Mode mode, TypedArray attrs) {
 		super(context);
+
 		ViewGroup header = (ViewGroup) LayoutInflater.from(context).inflate(R.layout.pull_to_refresh_header, this);
 		mHeaderText = (TextView) header.findViewById(R.id.pull_to_refresh_text);
 		mSubHeaderText = (TextView) header.findViewById(R.id.pull_to_refresh_sub_text);
@@ -67,8 +73,12 @@ public class LoadingLayout extends FrameLayout {
 		mHeaderImageMatrix = new Matrix();
 		mHeaderImage.setImageMatrix(mHeaderImageMatrix);
 
+        mHeaderProgress = (ProgressBar) header.findViewById(R.id.pull_to_refresh_progress);
+
 		mRotateAnimation = AnimationUtils.loadAnimation(context,R.anim.progress_rotate);
         mRotateAnimation.setRepeatCount(Animation.INFINITE);
+
+        mLoadingImageShouldRotate = true;
 
 		switch (mode) {
 			case PULL_UP_TO_REFRESH:
@@ -123,6 +133,7 @@ public class LoadingLayout extends FrameLayout {
 		mHeaderText.setText(Html.fromHtml(mPullLabel));
 		mHeaderImage.setVisibility(View.VISIBLE);
 		mHeaderImage.clearAnimation();
+        mHeaderProgress.setVisibility(View.GONE);
 
 		resetImageRotation();
 
@@ -143,7 +154,9 @@ public class LoadingLayout extends FrameLayout {
 
 	public void refreshing() {
 		mHeaderText.setText(Html.fromHtml(mRefreshingLabel));
-		mHeaderImage.startAnimation(mRotateAnimation);
+        mHeaderImage.clearAnimation();
+        mHeaderImage.setVisibility(View.INVISIBLE);
+        mHeaderProgress.setVisibility(View.VISIBLE);
 
 		mSubHeaderText.setVisibility(View.GONE);
 	}

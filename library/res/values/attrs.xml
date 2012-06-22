@@ -13,6 +13,7 @@
         </attr>
         <attr name="ptrShowIndicator" format="reference|boolean" />
         <attr name="ptrDrawable" format="reference" />
+        <attr name="ptrLoadingProgressStyle" format="reference" />
     </declare-styleable>
 
 </resources>
