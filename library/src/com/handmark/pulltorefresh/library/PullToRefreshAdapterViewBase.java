@@ -47,13 +47,6 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 	private OnLastItemVisibleListener mOnLastItemVisibleListener;
 	private View mEmptyView;
 
-    private int mCurrentScrollState;
-    private boolean mFingerUp = true;
-    private final Handler mFlingHandler = new FlingHandler();
-    private static final int MESSAGE_FLING_DONE = 1;
-    private static final int DELAY_FLING_DONE = 500;
-    private OnFlingListener mOnFlingListener;
-
     private IndicatorLayout mIndicatorIvTop;
 	private IndicatorLayout mIndicatorIvBottom;
 
@@ -130,34 +123,13 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 	}
 
     public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-            if (null != mOnScrollListener) {
-                mOnScrollListener.onScrollStateChanged(view, scrollState);
-            }
-            /*
-            switch (scrollState){
-                case 1:
-                    Debug.startMethodTracing("scroll");
-                    break;
-                case 0:
-                    Debug.stopMethodTracing();
-                    break;
-            }*/
-
-            if (mCurrentScrollState == SCROLL_STATE_FLING && scrollState != SCROLL_STATE_FLING) {
-                final Message message = mFlingHandler.obtainMessage(MESSAGE_FLING_DONE, getContext());
-                mFlingHandler.removeMessages(MESSAGE_FLING_DONE);
-                mFlingHandler.sendMessageDelayed(message, mFingerUp ? 0 : DELAY_FLING_DONE);
-
-            } else if (scrollState == SCROLL_STATE_FLING) {
-                mFlingHandler.removeMessages(MESSAGE_FLING_DONE);
-                if (mOnFlingListener != null) mOnFlingListener.onFling();
-            }
-            mCurrentScrollState = scrollState;
+        if (null != mOnScrollListener) {
+            mOnScrollListener.onScrollStateChanged(view, scrollState);
         }
+    }
 
 
-
-	/**
+    /**
 	 * Pass-through method for {@link PullToRefreshBase#getRefreshableView()
 	 * getRefreshableView()}.{@link AdapterView#setAdapter(ListAdapter)
 	 * setAdapter(adapter)}. This is just for convenience!
@@ -485,22 +457,4 @@ public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extend
 			}
 		}
 	}
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        final int action = event.getAction();
-        mFingerUp = action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL;
-        return false;
-    }
-
-    private class FlingHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MESSAGE_FLING_DONE:
-                    if (mOnFlingListener != null) mOnFlingListener.onFlingDone();
-                    break;
-            }
-        }
-    }
 }

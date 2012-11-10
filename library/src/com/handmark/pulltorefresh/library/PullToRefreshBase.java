@@ -1238,15 +1238,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 
     }
 
-    public static interface OnFlingListener {
-
-        public void onFling();
-
-        public void onFlingDone();
-
-    }
-
-	/**
+    /**
 	 * An advanced version of the Listener to listen for callbacks to Refresh.
 	 * This listener is different as it allows you to differentiate between Pull
 	 * Ups, and Pull Downs.
