@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.handmark.pulltorefresh.sample;
+package com.handmark.pulltorefresh.samples;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -22,7 +22,7 @@ import android.webkit.WebViewClient;
 
 import com.handmark.pulltorefresh.library.PullToRefreshWebView;
 
-public class PullToRefreshWebViewActivity extends Activity {
+public final class PullToRefreshWebViewActivity extends Activity {
 
 	PullToRefreshWebView mPullRefreshWebView;
 	WebView mWebView;
@@ -31,7 +31,7 @@ public class PullToRefreshWebViewActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.pull_to_refresh_webview);
+		setContentView(R.layout.activity_ptr_webview);
 
 		mPullRefreshWebView = (PullToRefreshWebView) findViewById(R.id.pull_refresh_webview);
 		mWebView = mPullRefreshWebView.getRefreshableView();

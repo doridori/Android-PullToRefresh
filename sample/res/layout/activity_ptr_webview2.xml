@@ -6,9 +6,9 @@
 
 <!--     The PullToRefreshWebView replaces a standard WebView widget. -->
 
-    <com.handmark.pulltorefresh.library.PullToRefreshWebView
-        xmlns:ptr="http://schemas.android.com/apk/res/com.handmark.pulltorefresh.sample"
-        android:id="@+id/pull_refresh_webview"
+    <com.handmark.pulltorefresh.library.extras.PullToRefreshWebView2
+        xmlns:ptr="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/pull_refresh_webview2"
         android:layout_height="fill_parent"
         android:layout_width="fill_parent"
         ptr:ptrMode="both" />

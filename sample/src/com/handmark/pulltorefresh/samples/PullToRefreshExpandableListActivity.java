@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.handmark.pulltorefresh.sample;
+package com.handmark.pulltorefresh.samples;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,12 +25,14 @@ import java.util.Map;
 import android.app.ExpandableListActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshExpandableListView;
 
-public class PullToRefreshExpandableListActivity extends ExpandableListActivity {
+public final class PullToRefreshExpandableListActivity extends ExpandableListActivity {
 	private static final String KEY = "key";
 	private LinkedList<String> mListItems, mGroupItems;
 	private PullToRefreshExpandableListView mPullRefreshListView;
@@ -40,14 +42,14 @@ public class PullToRefreshExpandableListActivity extends ExpandableListActivity 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.pull_to_refresh_expandable_list);
+		setContentView(R.layout.activity_ptr_expandable_list);
 
 		mPullRefreshListView = (PullToRefreshExpandableListView) findViewById(R.id.pull_refresh_expandable_list);
 
 		// Set a listener to be invoked when the list should be refreshed.
-		mPullRefreshListView.setOnRefreshListener(new OnRefreshListener() {
+		mPullRefreshListView.setOnRefreshListener(new OnRefreshListener<ExpandableListView>() {
 			@Override
-			public void onRefresh() {
+			public void onRefresh(PullToRefreshBase<ExpandableListView> refreshView) {
 				// Do work to refresh the list here.
 				new GetDataTask().execute();
 			}
