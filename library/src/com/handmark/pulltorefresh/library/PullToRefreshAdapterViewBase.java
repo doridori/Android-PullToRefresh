@@ -15,15 +15,15 @@
  *******************************************************************************/
 package com.handmark.pulltorefresh.library;
 
+import com.handmark.pulltorefresh.library.internal.EmptyViewMethodAccessor;
+import com.handmark.pulltorefresh.library.internal.IndicatorLayout;
+
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -33,11 +33,7 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
-
-import com.handmark.pulltorefresh.library.internal.EmptyViewMethodAccessor;
-import com.handmark.pulltorefresh.library.internal.IndicatorLayout;
 
 public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extends PullToRefreshBase<T> implements
 		OnScrollListener, View.OnTouchListener {
