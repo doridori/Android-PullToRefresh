@@ -36,7 +36,7 @@ import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 
 public abstract class PullToRefreshAdapterViewBase<T extends AbsListView> extends PullToRefreshBase<T> implements
-		OnScrollListener, View.OnTouchListener {
+		OnScrollListener {
 
 	private int mSavedLastVisibleIndex = -1;
 	private OnScrollListener mOnScrollListener;

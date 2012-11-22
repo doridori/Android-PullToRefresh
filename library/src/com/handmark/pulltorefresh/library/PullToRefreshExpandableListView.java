@@ -74,7 +74,6 @@ public class PullToRefreshExpandableListView extends PullToRefreshAdapterViewBas
 			PullToRefreshExpandableListView.this.setEmptyView(emptyView);
 		}
 
-		@Override
 		public void setEmptyViewInternal(View emptyView) {
 			super.setEmptyView(emptyView);
 		}
