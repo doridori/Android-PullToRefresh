@@ -93,7 +93,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 	private int mHeaderHeight;
 	private int mFooterHeight;
 
-
+    private OnConfigureHeaderListener mOnConfigureHeaderListener;
 	private OnRefreshListener<T> mOnRefreshListener;
 	private OnRefreshListener2<T> mOnRefreshListener2;
 	private OnPullEventListener<T> mOnPullEventListener;
@@ -250,6 +250,10 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 					mLastMotionY = mInitialMotionY = event.getY();
 					mLastMotionX = event.getX();
 					mIsBeingDragged = false;
+                    // callback so we can adjust the header text if necessary
+                    if (null != mOnConfigureHeaderListener) {
+                        mOnConfigureHeaderListener.onConfigureHeader();
+                    }
 				}
 				break;
 			}
@@ -298,6 +302,10 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 			case MotionEvent.ACTION_DOWN: {
 				if (isReadyForPull()) {
 					mLastMotionY = mInitialMotionY = event.getY();
+                    // callback so we can adjust the header text if necessary
+                    if (null != mOnConfigureHeaderListener) {
+                        mOnConfigureHeaderListener.onConfigureHeader();
+                    }
 					return true;
 				}
 				break;
@@ -400,7 +408,17 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 		mOnPullEventListener = listener;
 	}
 
-	@Override
+    /**
+    * Set OnConfigureHeaderListener for the Widget
+    *
+     @param listener - Listener to be used when the Widget header needs configuration
+    */
+
+    public final void setOnConfigureHeaderListener(OnConfigureHeaderListener listener) {
+        mOnConfigureHeaderListener = listener;
+    }
+
+    @Override
 	public final void setOnRefreshListener(OnRefreshListener<T> listener) {
 		mOnRefreshListener = listener;
 		mOnRefreshListener2 = null;

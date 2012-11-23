@@ -12,7 +12,7 @@
 
         <ProgressBar
             android:id="@+id/pull_to_refresh_progress"
-            style="?android:attr/progressBarStyleSmall"
+            style="?attr/ptrLoadingProgressStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -42,5 +42,4 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:visibility="gone" />
     </LinearLayout>
-
 </merge>
