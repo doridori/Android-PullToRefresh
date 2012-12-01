@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.chrisbanes.pulltorefresh</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.4.2-SOUNDCLOUD-SNAPSHOT</version>
+		<version>1.4.2-SOUNDCLOUD</version>
 	</parent>
 	<groupId>com.github.chrisbanes.pulltorefresh</groupId>
 	<artifactId>sample</artifactId>

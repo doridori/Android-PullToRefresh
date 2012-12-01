@@ -4,7 +4,7 @@
 	<groupId>com.github.chrisbanes.pulltorefresh</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-    <version>1.4.2-SOUNDCLOUD-SNAPSHOT</version>
+    <version>1.4.2-SOUNDCLOUD</version>
 	<name>Android-PullToRefresh Project</name>
 	<description>Implementation of the Pull-to-Refresh UI Pattern for Android.</description>
 	<url>https://github.com/chrisbanes/Android-PullToRefresh</url>
@@ -115,6 +115,12 @@
 		<sourceDirectory>src</sourceDirectory>
 	</build>
     <distributionManagement>
+        <repository>
+           <id>soundcloud-releases</id>
+           <name>SoundCloud Internal Releases</name>
+           <url>http://maven.int.s-cloud.net/content/repositories/releases</url>
+        </repository>
+
         <snapshotRepository>
             <id>soundcloud-thirdparty-snapshots</id>
             <name>SoundCloud ThirdParty Snapshots</name>
